@@ -49,39 +49,39 @@ int main(int argc, char **argv )
 	printf(" fun_populate_b(b, m, h*h); ");
 	printf("\n");
 	fun_populate_b(b, m, h*h);
-	printf("fun_col_fst_( m ,z,&n ,nn,  b); ");
+	printf("fun_col_fst(b, z, m, &n, nn); ");
 	printf("\n");
-	fun_col_fst_( m ,z,&n ,nn,  b);
+	fun_col_fst(b, z, m, &n, nn);
 
 
 	printf("transpose (bt,b,m); ");
 	printf("\n");
 	transpose (bt,b,m);
 
-	printf("fun_col_fstinv_(  m ,z, &n , nn,  bt); ");
+	printf("fun_col_fstinv(  bt , z , m , &n , nn ); ");
 	printf("\n");
-	fun_col_fstinv_(  m ,z, &n , nn,  bt);
+	fun_col_fstinv(  bt , z , m , &n , nn );
 
 
 	printf("fun_strange(diag, bt, m); ");
 	printf("\n");
 	fun_strange(diag, bt, m);
 
-	printf("fun_col_fst_( m ,z, &n , nn, bt); ");
+	printf("fun_col_fst(bt, z, m, &n, nn);");
 	printf("\n");
-	fun_col_fst_( m ,z, &n , nn, bt);
+	fun_col_fst(bt, z, m, &n, nn);
 
 	printf(" transpose (b,bt,m); ");
 	printf("\n");
 	transpose (b,bt,m);
 
-	printf(" fun_col_fstinv_(  m ,z,&n ,nn,b); ");
+	printf(" fun_col_fstinv( b, z, m, &n, nn); ");
 	printf("\n");
-	fun_col_fstinv_(  m ,z,&n ,nn,b);
+	fun_col_fstinv( b, z, m, &n, nn);
 
-	printf(" umax = fun_find_umax(m , b); ");
+	printf(" umax = fun_find_umax(b, m); ");
 	printf("\n");
-	umax = fun_find_umax(m , b);
+	umax = fun_find_umax(b, m);
 
 	printf (" umax = %e \n",umax);
 }

@@ -28,22 +28,22 @@ void fun_strange(Real *diag, Real **bt, int m) {
 	return;
 }
 
-
-void fun_col_fst_( int m , Real *z, int * n , int nn,Real ** bt){
+void fun_col_fst(Real **bt, Real *z, int m, int *n, int nn, )
 	for (int i=0; i < m; i++) {
 		fst_(bt[i], n, z, &nn);
 	}
 	return;
 }
 
-void fun_col_fstinv_( int m , Real *z, int * n , int nn,Real ** b){
+void fun_col_fstinv(Real **b , Real *z,  int m ,int *n , int nn){
 	for (int j=0; j < m; j++) {
 		fstinv_(b[j], n, z, &nn);
 	}
 	return;
 }
 
-Real fun_find_umax(int m , Real **b){
+Real fun_find_umax( Real **b ,int m ){
+Real fun_find_umax( int m  ,Real **b){
 	Real umax = 0.0; 
 	for (size_t j=0; j < m; j++) {
 		for (size_t i =0; i < m; i++) {
