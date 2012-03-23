@@ -12,5 +12,5 @@ ENABLE_LANGUAGE(Fortran)
 FILE(GLOB_RECURSE SRCS poisson_opprydning.c utils.c fst.f)
 
 ADD_EXECUTABLE(poisson ${SRCS})
-add_definitions(-std=c99)
+add_definitions(-std=c99 -fopenmp)
 SET_TARGET_PROPERTIES(poisson PROPERTIES LINKER_LANGUAGE C)

@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <memory.h>
 #include <math.h>
+#include <omp.h>
 typedef double Real;
 
 void fun_populate_diag( Real * diag, int m , int n);
