@@ -2,6 +2,7 @@
 #define  pi   3.14159265358979323846
 
 void fun_populate_diag( Real * diag, int m , int n){
+#pragma omp parallel for
 	for (int i=0; i < m; i++) {
 		diag[i] = 2.*(1.-cos((i+1)*pi/(Real)n));
 	}
@@ -9,6 +10,7 @@ void fun_populate_diag( Real * diag, int m , int n){
 }
 
 void fun_populate_b(Real **b, int m, Real h2) {
+#pragma omp parallel for
 	for (int j=0; j < m; j++) {
 		for (int i=0; i < m; i++) {
 			b[j][i] = h2;
@@ -20,6 +22,7 @@ void fun_populate_b(Real **b, int m, Real h2) {
 
 
 void fun_strange(Real *diag, Real **bt, int m) {
+#pragma omp parallel for
 	for (int j=0; j < m; j++) {
 		for (int i=0; i < m; i++) {
 			bt[j][i] = bt[j][i]/(diag[i]+diag[j]);
@@ -29,6 +32,7 @@ void fun_strange(Real *diag, Real **bt, int m) {
 }
 
 void fun_col_fst(Real **bt, Real *z, int m, int *n, int nn ){
+#pragma omp parallel for
 	for (int i=0; i < m; i++) {
 		fst_(bt[i], n, z, &nn);
 	}
@@ -36,6 +40,7 @@ void fun_col_fst(Real **bt, Real *z, int m, int *n, int nn ){
 }
 
 void fun_col_fstinv(Real **b , Real *z,  int m ,int *n , int nn){
+#pragma omp parallel for
 	for (int j=0; j < m; j++) {
 		fstinv_(b[j], n, z, &nn);
 	}
@@ -44,6 +49,7 @@ void fun_col_fstinv(Real **b , Real *z,  int m ,int *n , int nn){
 
 Real fun_find_umax( Real **b ,int m ){
 	Real umax = 0.0; 
+#pragma omp parallel for
 	for (size_t j=0; j < m; j++) {
 		for (size_t i =0; i < m; i++) {
 			if (b[j][i] > umax){
@@ -57,6 +63,7 @@ Real fun_find_umax( Real **b ,int m ){
 void transpose (Real **bt, Real **b, int m)
 {
 	int i, j;
+#pragma omp parallel for
 	for (j=0; j < m; j++) {
 		for (i=0; i < m; i++) {
 			bt[j][i] = b[i][j];
@@ -70,6 +77,7 @@ Real *createRealArray (int n)
 	Real *a;
 	int i;
 	a = (Real *)malloc(n*sizeof(Real));
+#pragma omp parallel for
 	for (i=0; i < n; i++) {
 		a[i] = 0.0;
 	}
