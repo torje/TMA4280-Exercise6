@@ -32,7 +32,6 @@ void fun_strange(Real *diag, Real **bt, int m) {
 }
 
 void fun_col_fst(Real **bt, Real *z, int m, int *n, int nn ){
-#pragma omp parallel for
 	for (int i=0; i < m; i++) {
 		fst_(bt[i], n, z, &nn);
 	}
@@ -40,7 +39,6 @@ void fun_col_fst(Real **bt, Real *z, int m, int *n, int nn ){
 }
 
 void fun_col_fstinv(Real **b , Real *z,  int m ,int *n , int nn){
-#pragma omp parallel for
 	for (int j=0; j < m; j++) {
 		fstinv_(b[j], n, z, &nn);
 	}
