@@ -63,7 +63,6 @@ Real fun_find_umax( Real **b ,int m ){
 void transpose (Real **bt, Real **b, int m)
 {
 	int i, j;
-#pragma omp parallel for
 	for (j=0; j < m; j++) {
 		for (i=0; i < m; i++) {
 			bt[j][i] = b[i][j];
