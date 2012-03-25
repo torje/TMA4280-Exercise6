@@ -2,7 +2,6 @@
 #define  pi   3.14159265358979323846
 
 void fun_populate_diag( Real * diag, int m , int n){
-#pragma omp parallel for
 	for (int i=0; i < m; i++) {
 		diag[i] = 2.*(1.-cos((i+1)*pi/(Real)n));
 	}
@@ -30,7 +29,6 @@ void fun_strange(Real *diag, Real **bt, int m) {
 }
 
 void fun_col_fst(Real **bt, Real *z, int m, int *n, int nn ){
-#pragma omp parallel for
 	for (int i=0; i < m; i++) {
 		fst_(bt[i], n, z, &nn);
 	}
@@ -38,7 +36,6 @@ void fun_col_fst(Real **bt, Real *z, int m, int *n, int nn ){
 }
 
 void fun_col_fstinv(Real **b , Real *z,  int m ,int *n , int nn){
-#pragma omp parallel for
 	for (int j=0; j < m; j++) {
 		fstinv_(b[j], n, z, &nn);
 	}
@@ -73,7 +70,6 @@ Real *createRealArray (int n)
 	Real *a;
 	int i;
 	a = (Real *)malloc(n*sizeof(Real));
-#pragma omp parallel for
 	for (i=0; i < n; i++) {
 		a[i] = 0.0;
 	}
