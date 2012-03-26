@@ -10,8 +10,8 @@ typedef double Real;
 void fun_populate_diag( Real * diag, int m , int n);
 void fun_populate_b(Real **b, int m, Real h2) ;
 void fun_strange(Real *diag, Real **bt, int m) ;
-void fun_col_fst(Real **bt, Real *z, int m, int *n, int nn );
-void fun_col_fstinv(Real **b , Real *z,  int m ,int *n , int nn);
+void fun_col_fst(Real **bt, Real *z, int m, int n, int nn );
+void fun_col_fstinv(Real **b , Real *z,  int m ,int n , int nn);
 Real fun_find_umax( Real **b ,int m );
 
 void transpose (Real **bt, Real **b, int m);

@@ -31,16 +31,31 @@ void fun_strange(Real *diag, Real **bt, int m) {
 	return;
 }
 
-void fun_col_fst(Real **bt, Real *z, int m, int *n, int nn ){
-	for (int i=0; i < m; i++) {
-		fst_(bt[i], n, z, &nn);
+void fun_col_fst(Real **bt, Real *z, int m, int n, int nn ){
+#pragma omp parallel 
+	{
+		int _n = n;
+		int _m = m;
+		int _nn = nn;
+#pragma omp for schedule(static)
+		for (int i=0; i < _m; i++) {
+			fst_(bt[i], &_n, z, &_nn);
+		}
 	}
 	return;
+
 }
 
-void fun_col_fstinv(Real **b , Real *z,  int m ,int *n , int nn){
-	for (int j=0; j < m; j++) {
-		fstinv_(b[j], n, z, &nn);
+void fun_col_fstinv(Real **b , Real *z,  int m ,int n , int nn){
+#pragma omp parallel 
+	{
+		int _n = n;
+		int _m = m;
+		int _nn = nn;
+#pragma omp for schedule(static)
+		for (int j=0; j < _m; j++) {
+			fstinv_(b[j], &_n, z, &_nn);
+		}
 	}
 	return;
 }
