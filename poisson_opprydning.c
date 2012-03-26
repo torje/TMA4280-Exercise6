@@ -18,7 +18,7 @@
 
 int main(int argc, char **argv )
 {
-	Real *diag, **b, **bt, *z;
+	Real *diag, **b, **bt;
 	Real pi, h, umax;
 	int i, j, n, m, nn;
 
@@ -38,7 +38,6 @@ int main(int argc, char **argv )
 	diag = createRealArray (m);
 	b    = createReal2DArray (m,m);
 	bt   = createReal2DArray (m,m);
-	z    = createRealArray (nn);
 
 	h    = 1./(Real)n;
 	pi   = 4.*atan(1.);
@@ -49,35 +48,35 @@ int main(int argc, char **argv )
 	printf(" fun_populate_b(b, m, h*h); ");
 	printf("\n");
 	fun_populate_b(b, m, h*h);
-	printf("fun_col_fst(b, z, m, n, nn); ");
+	printf("fun_col_fst(b, m, n, nn); ");
 	printf("\n");
-	fun_col_fst(b, z, m, n, nn);
+	fun_col_fst(b, m, n, nn);
 
 
 	printf("transpose (bt,b,m); ");
 	printf("\n");
 	transpose (bt,b,m);
 
-	printf("fun_col_fstinv(  bt , z , m , n , nn ); ");
+	printf("fun_col_fstinv(  bt , m , n , nn ); ");
 	printf("\n");
-	fun_col_fstinv(  bt , z , m , n , nn );
+	fun_col_fstinv(  bt , m , n , nn );
 
 
 	printf("fun_strange(diag, bt, m); ");
 	printf("\n");
 	fun_strange(diag, bt, m);
 
-	printf("fun_col_fst(bt, z, m, n, nn);");
+	printf("fun_col_fst(bt, m, n, nn);");
 	printf("\n");
-	fun_col_fst(bt, z, m, n, nn);
+	fun_col_fst(bt, m, n, nn);
 
 	printf(" transpose (b,bt,m); ");
 	printf("\n");
 	transpose (b,bt,m);
 
-	printf(" fun_col_fstinv( b, z, m, n, nn); ");
+	printf(" fun_col_fstinv( b,m, n, nn); ");
 	printf("\n");
-	fun_col_fstinv( b, z, m, n, nn);
+	fun_col_fstinv( b, m, n, nn);
 
 	printf(" umax = fun_find_umax(b, m); ");
 	printf("\n");

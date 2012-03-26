@@ -31,9 +31,10 @@ void fun_strange(Real *diag, Real **bt, int m) {
 	return;
 }
 
-void fun_col_fst(Real **bt, Real *z, int m, int n, int nn ){
-#pragma omp parallel 
+void fun_col_fst(Real **bt,  int m, int n, int nn ){
+#pragma omp parallel
 	{
+		Real *z = malloc(sizeof(Real)*nn);
 		int _n = n;
 		int _m = m;
 		int _nn = nn;
@@ -41,14 +42,16 @@ void fun_col_fst(Real **bt, Real *z, int m, int n, int nn ){
 		for (int i=0; i < _m; i++) {
 			fst_(bt[i], &_n, z, &_nn);
 		}
+		free(z);
 	}
 	return;
 
 }
 
-void fun_col_fstinv(Real **b , Real *z,  int m ,int n , int nn){
-#pragma omp parallel 
+void fun_col_fstinv(Real **b , int m ,int n , int nn){
+#pragma omp parallel
 	{
+		Real *z = malloc(sizeof(Real)*nn);
 		int _n = n;
 		int _m = m;
 		int _nn = nn;
@@ -56,6 +59,7 @@ void fun_col_fstinv(Real **b , Real *z,  int m ,int n , int nn){
 		for (int j=0; j < _m; j++) {
 			fstinv_(b[j], &_n, z, &_nn);
 		}
+		free(z);
 	}
 	return;
 }
@@ -77,6 +81,7 @@ void transpose (Real **bt, Real **b, int m)
 {
 	int i, j;
 	for (j=0; j < m; j++) {
+//#pragma omp parallel for schedule(static)
 		for (i=0; i < m; i++) {
 			bt[j][i] = b[i][j];
 		}
