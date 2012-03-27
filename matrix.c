@@ -14,7 +14,7 @@ void matrix_delete(matrix_p old){
 	free( old );
 	return;
 }
-Real * matrix_sort(matrix_p old, int nprocs){
+Real * matrix_sort(matrix_p old){
 	Real * sorted = malloc( sizeof(Real)*old -> depth * old-> width);
 	Real * ptr = sorted;
 	int stride;
@@ -30,17 +30,17 @@ Real * matrix_sort(matrix_p old, int nprocs){
 	}
 	return sorted;
 }
-int* create_senddispl( int size , int nprocs) {
+int* create_senddispl() {
 	int * sizes = malloc( sizeof( Real ) * nprocs );
 	sizes[0] = 0;
 	{
 		int i;
 		int block;
-		block = size / nprocs +1;
-		for (i = 1 ; i < size %nprocs ; i++) {
+		block = problemsize / nprocs +1;
+		for (i = 1 ; i < problemsize %nprocs ; i++) {
 			sizes[i] = sizes[i-1]+block;
 		}
-		block = size / nprocs;
+		block = problemsize / nprocs;
 		for (		; i < nprocs ; ++i) {
 			sizes[i] = sizes[i-1]+block;
 		}
@@ -48,16 +48,16 @@ int* create_senddispl( int size , int nprocs) {
 	return sizes; 
 }
 
-int* matrix_helper( int size , int nprocs) {
+int* matrix_helper() {
 	int * sizes = malloc( sizeof( Real ) * nprocs );
 	{
 		int i;
 		int block;
-		block = size / nprocs +1;
-		for (i = 0 ; i < size %nprocs ; i++) {
+		block = problemsize / nprocs +1;
+		for (i = 0 ; i < problemsize %nprocs ; i++) {
 			sizes[i] = block;
 		}
-		block = size / nprocs;
+		block = problemsize / nprocs;
 		for (		; i < nprocs ; ++i) {
 			sizes[i] = block;
 		}
@@ -65,25 +65,15 @@ int* matrix_helper( int size , int nprocs) {
 	return sizes; 
 }
 
-int* processlist(int nprocs){
-	int * processlist = malloc(sizeof(int)*nprocs);
-	for( int i = 0 ; i < nprocs ; ++i){
-		processlist[i] = i;
-	}
-	return processlist;
-}
 comm_helper_p create_comm_list(matrix_p data){
 	comm_helper_p comms = malloc(sizeof(comm_helper_t));
-	comms -> nprocs = nprocs;
-	comms -> problemsize = problemsize;
-	comms -> range = processlist(nprocs);
-	comms -> partitions = matrix_helper(problemsize, nprocs);
-	comms -> data= matrix_sort(data, nprocs);
-	comms -> senddispl= create_senddispl(problemsize, nprocs);
+	comms -> partitions = matrix_helper();
+	comms -> data= matrix_sort(data);
+	comms -> senddispl= create_senddispl();
 	return comms;
 }
 void free_comm_list(comm_helper_p a){
-    free( a ->partitions)
+    free( a ->partitions);
     free( a ->range);
     free( a ->senddispl);
 	free( a ->recvcounts);
