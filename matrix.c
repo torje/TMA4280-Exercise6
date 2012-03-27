@@ -90,7 +90,7 @@ void free_comm_list(comm_helper_p a){
 	return;
 }
 matrix_p sendarr( comm_helper_p a){
-	int width = a -> problemsize / nprocs + (a -> problemsize %nprocs < myrank)?1: 0;
+	int width = problemsize / nprocs +  ((problemsize %nprocs < myrank)?1: 0);
 	int depth = a -> problemsize;
 	int recvsize = width * depth;
 	Real *recvbuf = malloc(sizeof(Real)*recvsize);
