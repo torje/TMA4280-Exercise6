@@ -72,7 +72,7 @@ int* processlist(int nprocs){
 	}
 	return processlist;
 }
-comm_helper_p create_comm_list(int nprocs, int problemsize, matrix_p data){
+comm_helper_p create_comm_list(matrix_p data){
 	comm_helper_p comms = malloc(sizeof(comm_helper_t));
 	comms -> nprocs = nprocs;
 	comms -> problemsize = problemsize;
@@ -94,18 +94,25 @@ matrix_p sendarr( comm_helper_p a){
 	int depth = a -> problemsize;
 	int recvsize = width * depth;
 	Real *recvbuf = malloc(sizeof(Real)*recvsize);
-	MPI_Alltoallv( a -> data ,a -> partitions, a -> senddispl, MPI_DOUBLE, recvbuf);
+	MPI_Alltoallv( a -> data ,a -> partitions, a -> senddispl, MPI_DOUBLE, recvbuf, a->recvcounts, a->recvdispl , MPI_DOUBLE, world_com);
 }
 
-int * receivecounts(int nprocs, int dim){
+int * c_receivecounts(){
 	int *  recv = malloc(sizeof(int)*nprocs);
-	int *i;
-	for (i = recv ; i < recv+(dim %nprocs) ; ++i){
-		i = problemsize / nprocs + 1;
-	}
-	for (		; i < recv + nprocs ; ++i){
-		i = problemsize / nprocs ;
+	int recvsize = problemsize / nprocs +( ( problemsize % nprocs) >= myrank) ? 1:0;
+	for (int *i = recv ; i < recv + nprocs ; ++i){
+		*i = recvsize;
 	}
 	return recv;
 }
+
+int *c_recvdispl(){
+	int *  recv = malloc(sizeof(int)*nprocs);
+	int recvsize = problemsize / nprocs +( ( problemsize % nprocs) >= myrank) ? 1:0;
+	for (int i = 0 ; i < nprocs  ; ++i){
+		recv[i] = i*recvsize;
+	}
+	return recv;
+}
+
 
