@@ -83,15 +83,18 @@ comm_helper_p create_comm_list(matrix_p data){
 	return comms;
 }
 void free_comm_list(comm_helper_p a){
-    free(a -> range);
-    free(a -> partitions);
-    free(a -> data);
+    free( a ->partitions)
+    free( a ->range);
+    free( a ->senddispl);
+	free( a ->recvcounts);
+	free( a ->recvdispl);
+	free( a ->data);
 	free(a);
 	return;
 }
 matrix_p sendarr( comm_helper_p a){
 	int width = problemsize / nprocs +  ((problemsize %nprocs < myrank)?1: 0);
-	int depth = a -> problemsize;
+	int depth = problemsize;
 	int recvsize = width * depth;
 	Real *recvbuf = malloc(sizeof(Real)*recvsize);
 	MPI_Alltoallv( a -> data ,a -> partitions, a -> senddispl, MPI_DOUBLE, recvbuf, a->recvcounts, a->recvdispl , MPI_DOUBLE, world_com);
