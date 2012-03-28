@@ -30,6 +30,17 @@ Real * matrix_sort(matrix_p old){
 	}
 	return sorted;
 }
+matrix_p matrix_unsort(Real * data){
+	int width = problemsize / nprocs +  ((problemsize %nprocs < myrank)?1: 0);
+	matrix_p matrix = matrix_construct( width , problemsize);
+	for ( int i = 0 ; i < width ; ++i){
+		for ( int j = 0 ; j < problemsize ; ++j){
+			matrix -> vals[i][j] = data[i*width + j];
+		}
+	}
+	free(data);
+	return matrix;
+}
 int* create_senddispl() {
 	int * sizes = malloc( sizeof( Real ) * nprocs );
 	sizes[0] = 0;
@@ -48,7 +59,7 @@ int* create_senddispl() {
 	return sizes; 
 }
 
-int* matrix_helper() {
+int* c_sendcounts() {
 	int * sizes = malloc( sizeof( Real ) * nprocs );
 	{
 		int i;
@@ -67,14 +78,15 @@ int* matrix_helper() {
 
 comm_helper_p create_comm_list(matrix_p data){
 	comm_helper_p comms = malloc(sizeof(comm_helper_t));
-	comms -> partitions = matrix_helper();
+	comms -> sendcounts = c_sendcounts();
 	comms -> data= matrix_sort(data);
 	comms -> senddispl= create_senddispl();
+	comms -> recvdispl = c_recvdispl();
+	comms -> recvcounts = c_receivecounts();
 	return comms;
 }
 void free_comm_list(comm_helper_p a){
-    free( a ->partitions);
-    free( a ->range);
+    free( a ->sendcounts);
     free( a ->senddispl);
 	free( a ->recvcounts);
 	free( a ->recvdispl);
@@ -82,12 +94,13 @@ void free_comm_list(comm_helper_p a){
 	free(a);
 	return;
 }
-matrix_p sendarr( comm_helper_p a){
+Real *sendarr( comm_helper_p a){
 	int width = problemsize / nprocs +  ((problemsize %nprocs < myrank)?1: 0);
 	int depth = problemsize;
 	int recvsize = width * depth;
 	Real *recvbuf = malloc(sizeof(Real)*recvsize);
-	MPI_Alltoallv( a -> data ,a -> partitions, a -> senddispl, MPI_DOUBLE, recvbuf, a->recvcounts, a->recvdispl , MPI_DOUBLE, world_com);
+	MPI_Alltoallv( a -> data ,a -> senddispl, a -> senddispl, MPI_DOUBLE, recvbuf, a->recvcounts, a->recvdispl , MPI_DOUBLE, world_com);
+	return recvbuf;
 }
 
 int * c_receivecounts(){
@@ -107,5 +120,11 @@ int *c_recvdispl(){
 	}
 	return recv;
 }
-
-
+matrix_p  transpose(matrix_p old){
+	comm_helper_p com = create_comm_list(old);
+	Real * received = sendarr(com);
+	matrix_p new = matrix_unsort(received);
+	free(received);
+	free_comm_list(com);
+	return new;
+}

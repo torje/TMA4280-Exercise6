@@ -8,11 +8,10 @@ typedef struct {
 	Real ** vals; 
 } matrix_t;
 typedef matrix_t * matrix_p;
-matrix_p matrix_construct(int width, int depth);
+
 void matrix_delete(matrix_p old);
 typedef struct {
-	int  *partitions;
-	int  *range;
+	int  *sendcounts;
 	int  *senddispl;
 	int  *recvcounts;
 	int	 *recvdispl;
@@ -20,10 +19,7 @@ typedef struct {
 } comm_helper_t;
 typedef comm_helper_t * comm_helper_p;
 
-comm_helper_p create_comm_list(matrix_p data);
-void free_comm_list(comm_helper_p a);
 
-int* create_senddispl();
 
 /*int MPI_Alltoallv(void *sendbuf, 
   int *sendcnts, 
@@ -33,5 +29,18 @@ int* create_senddispl();
   int *recvcnts, 
   int *rdispls, 
   MPI_Datatype recvtype, 
-  aMPI_Comm comm)
+  MPI_Comm comm)
   */
+
+matrix_p matrix_construct(int width, int depth);
+void matrix_delete(matrix_p old);
+Real *matrix_sort(matrix_p old);
+matrix_p matrix_unsort(Real * data);
+int *create_senddispl() ;
+int *c_sendcounts() ;
+comm_helper_p create_comm_list(matrix_p data);
+void free_comm_list(comm_helper_p a);
+Real *sendarr( comm_helper_p a);
+int *c_receivecounts();
+int *c_recvdispl();
+matrix_p  transpose(matrix_p old);
