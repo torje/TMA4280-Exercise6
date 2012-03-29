@@ -1,7 +1,4 @@
-#include <stdlib.h>
-#include <string.h>
 #include "matrix.h"
-#include <unistd.h>
 
 matrix_p matrix_construct(int width, int depth){
 	matrix_p matrix = malloc(sizeof(matrix_t));
@@ -19,19 +16,29 @@ void matrix_delete(matrix_p old){
 	return;
 }
 Real * matrix_sort(matrix_p old){
-	Real * sorted = malloc( sizeof(Real)*old -> depth * old-> width);
+	Real * sorted = malloc( sizeof(Real)*((old -> depth) )* (old-> width) );
 	Real * ptr = sorted;
 	int stride;
 	int offset = 0;
-	for ( int j = 0 ; j < old -> depth ; ++j){
+	stride = old -> depth/nprocs;
+	for ( int j = 0 ; j < old -> depth /stride ; ++j){
 		stride = old -> depth/nprocs;
-		stride += (j <  old->depth / nprocs ) ? 1 : 0 ;
+		stride += (j <  old->depth % nprocs ) ? 1 : 0 ;
+		printf("	for ( int i = 0 ; i < old -> width ; ++i ){\n");
 		for ( int i = 0 ; i < old -> width ; ++i ){
+			printf("element %lf\n",old -> vals[i][0]+offset);
 			memcpy( ptr , &(old -> vals[i][0])+offset,  stride*sizeof(Real));
 			ptr += stride;
 		}
+		printf("	offset+=stride;\n");
 		offset+=stride;
 	}
+	printf("%lf\n",sorted[2]);
+	printf("	return sorted;\n");
+	for (int i = 0 ; i < 25 ; ++i){
+		printf("%lf ", sorted[i]);
+	}
+	printf("\n");
 	return sorted;
 }
 matrix_p matrix_unsort(Real * data){
@@ -40,13 +47,18 @@ matrix_p matrix_unsort(Real * data){
 	for ( int i = 0 ; i < width ; ++i){
 		for ( int j = 0 ; j < problemsize ; ++j){
 			matrix -> vals[i][j] = data[i*width + j];
+			printf("%lf\n", data[i*width + j]);
 		}
 	}
 	free(data);
 	return matrix;
 }
 int* create_senddispl() {
-	int * aaa = calloc( 1024, sizeof( int ) );
+	printf("	int * aaa;\n");
+	int * aaa;
+	printf("	aaa = malloc( 1024* sizeof( int ) );\n");
+	aaa = malloc( 1024* sizeof( int ) );
+	printf("	return aaa;\n");
 	return aaa;
 	//printf("	sizes[0] = 0;\n");
 	//sizes[0] = 0;
@@ -92,8 +104,8 @@ comm_helper_p create_comm_list(matrix_p data){
 	comms -> sendcounts = c_sendcounts();
 	printf("	comms -> data= matrix_sort(data);\n");
 	comms -> data= matrix_sort(data);
-	//printf("	comms -> senddispl= create_senddispl();\n");
-	//comms -> senddispl= create_senddispl();
+	printf("	comms -> senddispl= create_senddispl();\n");
+	comms -> senddispl= create_senddispl();
 	printf("	comms -> recvdispl = c_recvdispl();\n");
 	comms -> recvdispl = c_recvdispl();
 	printf("	comms -> recvcounts = c_receivecounts();\n");
@@ -115,6 +127,9 @@ Real *sendarr( comm_helper_p a){
 	int depth = problemsize;
 	int recvsize = width * depth;
 	Real *recvbuf = malloc(sizeof(Real)*recvsize);
+	for ( int i = 0; i < nprocs ; ++i){
+		printf("sendcnts = %d,  senddispls = %d, receivecounts =%d, receivedispls = %d\n",  a -> senddispl[i], a -> senddispl[i],  a->recvcounts[i], a->recvdispl[i]); 
+	}
 	MPI_Alltoallv( a -> data ,a -> senddispl, a -> senddispl, MPI_DOUBLE, recvbuf, a->recvcounts, a->recvdispl , MPI_DOUBLE, MPI_COMM_WORLD);
 	return recvbuf;
 }
