@@ -1,4 +1,5 @@
 #include <mpi.h>
+#include <stdio.h>
 extern int nprocs, myrank, problemsize;
 extern MPI_Comm world_com;
 typedef double Real;
