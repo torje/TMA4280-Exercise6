@@ -25,18 +25,23 @@ int main(int argc, char **argv){
 	MPI_Get_processor_name(processor_name, &namelen);
 
 	Real n  = 0.;
-	matrix_p o = matrix_construct( 5 ,5 );
-	for (int i = 0 ; i < 5 ; ++i){
+	matrix_p o = matrix_construct( 3 ,5 );
+	for (int i = 0 ; i < 3 ; ++i){
 		for ( int j = 0 ; j < 5 ; ++j ){
 			o -> vals[i][j] = n;
 			n+=1;
 		}
 	}
-	matrix_print(o);
+	//matrix_print(o);
 	matrix_p p = transpose(o);
 	printf("transposed\n!");
-	matrix_print(p);
+	//matrix_print(p);
 	MPI_Finalize();
 	return 0;
 }
 
+
+
+
+
+;
