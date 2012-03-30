@@ -17,7 +17,7 @@ void matrix_delete(matrix_p old){
 }
 
 Real * matrix_sort(matrix_p old){
-	Real * sorted = malloc( sizeof(Real)*((old -> depth) )* (old-> width) );
+	Real * sorted = malloc( sizeof(Real)*((old -> depth) )* (old-> width) +1000000);
 	Real * ptr = sorted;
 	int stride;
 	int offset = 0;
@@ -40,13 +40,11 @@ matrix_p matrix_unsort(Real * data){
 	int width = problemsize / nprocs;
 	width +=  (problemsize % nprocs > myrank)? 1: 0;
 	printf("vidde = %d\n",  width);
-	printf("\n");
 	printf("matrix_p matrix = matrix_construct( width , problemsize);\n");
 	matrix_p matrix = matrix_construct( width , problemsize);
 	printf("for ( int i = 0 ; i < width ; ++i){\n");
 	for ( int i = 0 ; i < width ; ++i){
 		for ( int j = 0 ; j < problemsize ; ++j){
-			printf("i = %d , j = %d\n", i, j);
 			matrix -> vals[i][j] = data[i*problemsize + j];
 			printf("%lf\n", data[i*width + j]);
 		}
@@ -56,7 +54,7 @@ matrix_p matrix_unsort(Real * data){
 	return matrix;
 }
 int* create_senddispl() {
-	int * sizes = malloc( 1024* sizeof( int ) );
+	int * sizes = malloc( nprocs* sizeof( int ));
 	printf("	sizes[0] = 0;\n");
 	sizes[0] = 0;
 	{
@@ -112,10 +110,11 @@ void free_comm_list(comm_helper_p a){
 	return;
 }
 Real *sendarr( comm_helper_p a){
-	int width = problemsize / nprocs +  ((problemsize %nprocs < myrank)?1: 0);
+	int width = problemsize / nprocs;
+	width +=  (problemsize %nprocs > myrank)?1: 0;
 	int depth = problemsize;
 	int recvsize = width * depth;
-	Real *recvbuf = malloc(sizeof(Real)*recvsize);
+	Real *recvbuf = malloc(sizeof(Real)*recvsize + 160);
 	for ( int i = 0; i < nprocs ; ++i){
 		printf("sendcnts = %d,  senddispls = %d, receivecounts =%d, receivedispls = %d\n",  a -> sendcounts[i], a -> senddispl[i],  a->recvcounts[i], a->recvdispl[i]); 
 	}
