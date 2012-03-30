@@ -36,6 +36,7 @@ typedef comm_helper_t * comm_helper_p;
   MPI_Comm comm)
   */
 
+int calc_width(int rank);
 matrix_p matrix_construct(int width, int depth);
 void matrix_delete(matrix_p old);
 Real *matrix_sort(matrix_p old);

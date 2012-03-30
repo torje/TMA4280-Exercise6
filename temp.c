@@ -17,31 +17,51 @@ void matrix_print(matrix_p a){
 }
 int main(int argc, char **argv){
 	problemsize = 5;
-	
+
 	MPI_Init( &argc, &argv);
 	MPI_Comm_size(MPI_COMM_WORLD, &nprocs);
-	printf("%d\n", nprocs);
 	MPI_Comm_rank(MPI_COMM_WORLD, &myrank);
 	MPI_Get_processor_name(processor_name, &namelen);
 
-	Real n  = 0.;
-	matrix_p o = matrix_construct( 3 ,5 );
-	for (int i = 0 ; i < 3 ; ++i){
+	matrix_p o;
+	if (myrank == 0 ){
+		o = matrix_construct( 1,5 );
 		for ( int j = 0 ; j < 5 ; ++j ){
-			o -> vals[i][j] = n;
-			n+=1;
+			double i =0;
+			o -> vals[0][j] = i*5+j+1000;
+		}
+	} else if (myrank ==1 ){
+		o = matrix_construct( 1,5 );
+		for ( int j = 0 ; j < 5 ; ++j ){
+			double i =0;
+			o -> vals[0][j] = i*5+j+1000;
+		}
+	}else if (myrank == 2){
+		o = matrix_construct( 1,5 );
+		for ( int j = 0 ; j < 5 ; ++j ){
+			double i =0;
+			o -> vals[0][j] = i*5+j+1000;
 		}
 	}
-	//matrix_print(o);
+	else if (myrank == 3){
+		o = matrix_construct( 1,5 );
+		for ( int j = 0 ; j < 5 ; ++j ){
+			double i =0;
+			o -> vals[0][j] = i*5+j+1000;
+		}
+	}
+	else if (myrank == 4){
+		o = matrix_construct( 1,5 );
+		for ( int j = 0 ; j < 5 ; ++j ){
+			double i =0;
+			o -> vals[0][j] = i*5+j+1000;
+		}
+	}
+	printf("process - %d", myrank);
+	matrix_print(o);
 	matrix_p p = transpose(o);
-	printf("transposed\n!");
+	//printf("transposed\n!");
 	//matrix_print(p);
 	MPI_Finalize();
 	return 0;
 }
-
-
-
-
-
-;
