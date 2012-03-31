@@ -1,6 +1,7 @@
 #include <mpi.h>
 #include "matrix.h"
 #include <stdio.h>
+#include <math.h>
 #include <unistd.h>
 int nprocs, problemsize, width, myrank, namelen;
 char processor_name[MPI_MAX_PROCESSOR_NAME];
@@ -10,58 +11,34 @@ void matrix_print(matrix_p a){
 	for ( int i =0; i <a->width; ++i ){
 		printf("[ ");
 		for ( int j = 0 ; j < a->depth; ++j){
-			printf(" %lf " , a->vals[i][j]);
+			printf(" %.0lf " , a->vals[i][j]);
 		}
 		printf(" ]\n");
 	}
 }
+Real inhabitant(int i , int  j, Real scale){
+	Real _i = i;
+	Real _j = j;
+	//return scale*sin(M_PI*_i*scale)*sin(M_PI*_i*scale);
+	return _i*5+j;
+}
 int main(int argc, char **argv){
-	problemsize = 5;
+	problemsize = 25;
 
 	MPI_Init( &argc, &argv);
 	MPI_Comm_size(MPI_COMM_WORLD, &nprocs);
 	MPI_Comm_rank(MPI_COMM_WORLD, &myrank);
 	MPI_Get_processor_name(processor_name, &namelen);
-
-	matrix_p o;
-	if (myrank == 0 ){
-		o = matrix_construct( 1,5 );
-		for ( int j = 0 ; j < 5 ; ++j ){
-			double i =0;
-			o -> vals[0][j] = i*5+j+1000;
-		}
-	} else if (myrank ==1 ){
-		o = matrix_construct( 1,5 );
-		for ( int j = 0 ; j < 5 ; ++j ){
-			double i =0;
-			o -> vals[0][j] = i*5+j+1000;
-		}
-	}else if (myrank == 2){
-		o = matrix_construct( 1,5 );
-		for ( int j = 0 ; j < 5 ; ++j ){
-			double i =0;
-			o -> vals[0][j] = i*5+j+1000;
-		}
-	}
-	else if (myrank == 3){
-		o = matrix_construct( 1,5 );
-		for ( int j = 0 ; j < 5 ; ++j ){
-			double i =0;
-			o -> vals[0][j] = i*5+j+1000;
-		}
-	}
-	else if (myrank == 4){
-		o = matrix_construct( 1,5 );
-		for ( int j = 0 ; j < 5 ; ++j ){
-			double i =0;
-			o -> vals[0][j] = i*5+j+1000;
-		}
-	}
-	printf("process - %d", myrank);
+	matrix_p o = Gen_matrix( problemsize, nprocs, myrank, &inhabitant);
+	sleep(myrank);
 	matrix_print(o);
+	sleep(5);
+	if (myrank == 0) printf("-------------------------------------\n");
 	matrix_p p = transpose(o);
-	//printf("transposed\n!");
-	//matrix_print(p);
+	sleep(myrank);
+	matrix_print(p);
+
+
 	MPI_Finalize();
 	return 0;
 }

@@ -37,10 +37,10 @@ void matrix_print(matrix_p a);
 matrix_p matrix_unsort(Real * data){
 	int width = problemsize / nprocs;
 	width +=  (problemsize % nprocs > myrank)? 1: 0;
-	matrix_p matrix = matrix_construct( problemsize, width);
+	matrix_p matrix = matrix_construct( width , problemsize);
 	for ( int i = 0 ; i < problemsize ; ++i){
 		for ( int j = 0 ; j < width ; ++j){
-			matrix -> vals[i][j] = data[i*width + j];
+			matrix -> vals[j][i] = data[i*width + j];
 		}
 	}
 	return matrix;
@@ -55,11 +55,11 @@ int* create_senddispl() {
 		width +=  (problemsize %nprocs > myrank)?1: 0;
 		block = problemsize / nprocs +1;
 		for (i = 1 ; i < 1+(problemsize %nprocs) ; i++) {
-			sizes[i] = sizes[i-1]+calc_width(i)*width;
+			sizes[i] = sizes[i-1] + calc_width(i-1)*width;
 		}
 		block = problemsize / nprocs;
 		for (		; i < nprocs ; ++i) {
-			sizes[i] = sizes[i-1]+calc_width(i)*width;
+			sizes[i] = sizes[i-1]+calc_width(i-1)*width;
 		}
 	}
 	return sizes; 
@@ -143,7 +143,7 @@ int *c_recvdispl(){
 	return recv;
 }
 
-matrix_p  transpose(matrix_p old){
+matrix_p  matrix_transpose(matrix_p old){
 	comm_helper_p com = create_comm_list(old);
 	Real * received = sendarr(com);
 	matrix_p new = matrix_unsort(received);
@@ -170,7 +170,6 @@ matrix_p Gen_matrix( int size , int _nprocs, int rank, Real (*func)(int,int,Real
 	int l_bound= l_bound_(size, _nprocs, rank );
 	int h_bound= h_bound_(size, _nprocs, rank );
 	Real scale=1/(Real)size;
-	printf("l=%d, h=%d\n", l_bound, h_bound);
 	matrix_p matrix = matrix_construct(h_bound - l_bound, size);
 	for(int i = l_bound ; i < h_bound ; ++i ){
 		for(int j = 0 ; j < size ; ++j ){
@@ -182,8 +181,21 @@ matrix_p Gen_matrix( int size , int _nprocs, int rank, Real (*func)(int,int,Real
 
 int calc_width_( int size, int _nprocs, int rank){
 	int width = size / _nprocs;
-	printf("width = %d\n", width);
 	width +=  (size % _nprocs > myrank)? 1: 0;
 	return width;
 }
 
+void matrix_fst( matrix_p matrix){
+#pragma omp parallel
+	{
+		int _depth = matrix -> depth;
+		int _n = _depth+1;
+		int _nn =  _n*4;
+		Real *temparray= malloc(sizeof(Real)*_nn);
+#pragma omp for schedule(static)
+		for ( int i = 0 ; i < matrix -> width ; ++i ){
+			fst_(matrix->vals[i], &_n, &_nn);
+		}
+		free(temparray);
+	}
+}

@@ -48,7 +48,7 @@ void free_comm_list(comm_helper_p a);
 Real *sendarr( comm_helper_p a);
 int *c_receivecounts();
 int *c_recvdispl();
-matrix_p  transpose(matrix_p old);
+matrix_p  matrix_transpose(matrix_p old);
 matrix_p Gen_matrix( int size , int nprocs, int rank, Real (*func)(int,int,Real));
 int calc_width_(int rank, int size, int nprocs);
 
