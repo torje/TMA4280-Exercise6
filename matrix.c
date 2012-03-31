@@ -150,3 +150,40 @@ matrix_p  transpose(matrix_p old){
 	free_comm_list(com);
 	return new;
 }
+int l_bound_(int size, int _nprocs, int rank){
+	int i= 0;
+	int displacement = 0;
+	for ( ;i < size % _nprocs && i < rank; displacement += size/_nprocs+1, ++i);
+	for ( ;i < rank; displacement += size/_nprocs, ++i);
+	return displacement;
+}
+int h_bound_(int size, int _nprocs, int rank){
+	int i= 0;
+	int displacement = 0;
+	for ( ;i < size % _nprocs && i <= rank; displacement += size/_nprocs+1, ++i);
+	for ( ;i <= rank; displacement += size/_nprocs, ++i);
+	return displacement;
+}
+
+matrix_p Gen_matrix( int size , int _nprocs, int rank, Real (*func)(int,int,Real)){
+	int width = calc_width_(size, _nprocs, rank);
+	int l_bound= l_bound_(size, _nprocs, rank );
+	int h_bound= h_bound_(size, _nprocs, rank );
+	Real scale=1/(Real)size;
+	printf("l=%d, h=%d\n", l_bound, h_bound);
+	matrix_p matrix = matrix_construct(h_bound - l_bound, size);
+	for(int i = l_bound ; i < h_bound ; ++i ){
+		for(int j = 0 ; j < size ; ++j ){
+			matrix -> vals[i-l_bound][j] = func( i, j, scale);
+		}
+	}
+	return matrix;
+}
+
+int calc_width_( int size, int _nprocs, int rank){
+	int width = size / _nprocs;
+	printf("width = %d\n", width);
+	width +=  (size % _nprocs > myrank)? 1: 0;
+	return width;
+}
+
