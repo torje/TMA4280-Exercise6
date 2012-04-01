@@ -23,7 +23,7 @@ MPI_Status status;
 
 Real habitant(int a, int b, Real scale){
 	//return scale*sin(scale*a*M_PI)*sin(scale*b*M_PI);
-	return scale;
+	return sin(M_PI*b*scale)*sin(M_PI*a*scale);
 	//return a*5 +b;
 }
 
@@ -76,8 +76,6 @@ int main(int argc, char **argv )
 	printf("fun_populate_diag(diag, m , n);\n");
 	fun_populate_diag(diag, m , n);
 
-	matrix_print(matrix1);
-	
 	printf("matrix_fst( matrix1);\n");
 	matrix_fst( matrix1);
 	

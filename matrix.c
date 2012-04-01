@@ -169,7 +169,7 @@ matrix_p Gen_matrix( int size , int _nprocs, int rank, Real (*func)(int,int,Real
 	int width = calc_width_(size, _nprocs, rank);
 	int l_bound= l_bound_(size, _nprocs, rank );
 	int h_bound= h_bound_(size, _nprocs, rank );
-	Real scale=1/((Real)(size+1)*(Real)(size+1));
+	Real scale=1/((Real)(size+1));
 	matrix_p matrix = matrix_construct(h_bound - l_bound, size);
 	for(int i = l_bound ; i < h_bound ; ++i ){
 		for(int j = 0 ; j < size ; ++j ){
