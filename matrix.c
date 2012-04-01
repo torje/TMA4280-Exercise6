@@ -169,7 +169,7 @@ matrix_p Gen_matrix( int size , int _nprocs, int rank, Real (*func)(int,int,Real
 	int width = calc_width_(size, _nprocs, rank);
 	int l_bound= l_bound_(size, _nprocs, rank );
 	int h_bound= h_bound_(size, _nprocs, rank );
-	Real scale=1/(Real)size;
+	Real scale=1/((Real)(size+1)*(Real)(size+1));
 	matrix_p matrix = matrix_construct(h_bound - l_bound, size);
 	for(int i = l_bound ; i < h_bound ; ++i ){
 		for(int j = 0 ; j < size ; ++j ){
@@ -186,16 +186,53 @@ int calc_width_( int size, int _nprocs, int rank){
 }
 
 void matrix_fst( matrix_p matrix){
-#pragma omp parallel
+//#pragma omp parallel
 	{
 		int _depth = matrix -> depth;
 		int _n = _depth+1;
 		int _nn =  _n*4;
-		Real *temparray= malloc(sizeof(Real)*_nn);
-#pragma omp for schedule(static)
+		Real *temparray= malloc(sizeof(Real)*_nn +1000000);
+//#pragma omp for schedule(static)
 		for ( int i = 0 ; i < matrix -> width ; ++i ){
-			fst_(matrix->vals[i], &_n, &_nn);
+			fst_(matrix->vals[i], &_n, temparray, &_nn);
 		}
 		free(temparray);
 	}
 }
+
+void matrix_fst_inv( matrix_p matrix){
+//#pragma omp parallel
+	{
+		int _depth = matrix->depth;
+		int _n = _depth+1;
+		int _nn = _n*4;
+		Real *temparray = malloc(sizeof(Real)*_nn);
+//#pragma omp for schedule(static)
+		for (int j=0; j < matrix->width; j++) {
+			fstinv_(matrix->vals[j], &_n, temparray, &_nn);
+		}
+		free(temparray);
+	}
+	return;
+}
+
+void matrix_strange(Real *diag, matrix_p matrix, int _nprocs, int rank) {
+	int l_bound = l_bound_(matrix -> depth, _nprocs, rank),
+		h_bound = h_bound_(matrix -> depth, _nprocs, rank);
+	for (int j=l_bound; j <h_bound ; j++) {
+		for (int i=0; i <matrix -> depth ; i++) {
+			matrix -> vals[j-l_bound][i] = matrix -> vals[j-l_bound][i]/(diag[i]+diag[j]);
+		}
+	}
+	return;
+}
+Real matrix_find_max(matrix_p matrix){
+	Real max=0;
+	for ( int i = 0 ; i < matrix -> width ; ++i){
+		for ( int j = 0 ; j < matrix -> width ; ++j){
+			max = (matrix->vals[i][j] > max ) ?matrix->vals[i][j] : max ;
+		}
+	}
+	return max;
+}
+
