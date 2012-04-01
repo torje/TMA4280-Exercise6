@@ -56,7 +56,7 @@ main(int argc, char **argv )
 	}
 	for (j=0; j < m; j++) {
 		for (i=0; i < m; i++) {
-			b[j][i] = h*h;
+			b[j][i] = sin(2*M_PI*h*j)*sin(M_PI*h*i);
 		}
 	}
 	for (j=0; j < m; j++) {

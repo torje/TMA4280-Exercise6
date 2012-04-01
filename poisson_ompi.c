@@ -22,18 +22,15 @@ char processor_name[MPI_MAX_PROCESSOR_NAME];
 MPI_Status status;
 
 Real habitant(int a, int b, Real scale){
-	//return scale*sin(scale*a*M_PI)*sin(scale*b*M_PI);
-	return sin(M_PI*b*scale)*sin(M_PI*a*scale);
-	//return a*5 +b;
+	return 5*M_PI*M_PI*scale*scale*sin(7*M_PI*(b)*scale)*sin(7*M_PI*(a)*scale);
 }
 
 void matrix_print(matrix_p a){
 	for ( int i =0; i <a->width; ++i ){
-		printf("[ ");
 		for ( int j = 0 ; j < a->depth; ++j){
 			printf(" %lf " , a->vals[i][j]);
 		}
-		printf(" ]\n");
+		printf("\n");
 	}
 }
 
@@ -65,7 +62,7 @@ int main(int argc, char **argv )
 	diag = createRealArray (m);
 	b    = createReal2DArray (m,m);
 	matrix_p matrix1 = Gen_matrix( m, nprocs, myrank, &habitant);
-	printf(" ----------- %d ------------- %d\n", matrix1 -> width, matrix1 -> depth);
+	//printf(" ----------- %d ------------- %d\n", matrix1 -> width, matrix1 -> depth);
 	bt   = createReal2DArray (m,m);
 
 	h    = 1./(Real)n;
@@ -73,58 +70,53 @@ int main(int argc, char **argv )
 
 	//matrix_print(matrix1);
 
-	printf("fun_populate_diag(diag, m , n);\n");
 	fun_populate_diag(diag, m , n);
 
-	printf("matrix_fst( matrix1);\n");
 	matrix_fst( matrix1);
 	
-	printf("matrix_p matrix2 = matrix_transpose(matrix1);\n");
 	matrix_p matrix2 = matrix_transpose(matrix1);
-	
-	printf("matrix_fst_inv(matrix2);\n");
+	//
 	matrix_fst_inv(matrix2);
-	
-	printf("matrix_strange(diag, matrix2, nprocs, myrank);\n");
+	//
 	matrix_strange(diag, matrix2, nprocs, myrank);
 
-	//printf(" ----------- %d ------------- %d\n", matrix2 -> width, matrix2 -> depth);
-	
-	printf("matrix_fst(matrix2);\n");
+	////printf(" ----------- %d ------------- %d\n", matrix2 -> width, matrix2 -> depth);
+	//
 	matrix_fst(matrix2);
-	
-	printf("matrix1 = matrix_transpose(matrix2);\n");
+	//
 	matrix1 = matrix_transpose(matrix2);
-	
-	printf("matrix_fst_inv(matrix1);\n");
+	//
 	matrix_fst_inv(matrix1);
 
-	//printf("transpose (bt,b,m); ");
-	//printf("\n");
-	//transpose (bt,b,m);
+	////printf("transpose (bt,b,m); ");
+	////printf("\n");
+	////transpose (bt,b,m);
 
-	//printf("fun_col_fstinv(  bt , m , n , nn ); ");
-	//printf("\n");
-	//fun_col_fstinv(  bt , m , n , nn );
+	////printf("fun_col_fstinv(  bt , m , n , nn ); ");
+	////printf("\n");
+	////fun_col_fstinv(  bt , m , n , nn );
 
 
-	//printf("fun_strange(diag, bt, m); ");
-	//printf("\n");
-	//fun_strange(diag, bt, m);
+	////printf("fun_strange(diag, bt, m); ");
+	////printf("\n");
+	////fun_strange(diag, bt, m);
 
-	//printf("fun_col_fst(bt, m, n, nn);");
-	//printf("\n");
-	//fun_col_fst(bt, m, n, nn);
+	////printf("fun_col_fst(bt, m, n, nn);");
+	////printf("\n");
+	////fun_col_fst(bt, m, n, nn);
 
-	//printf(" transpose (b,bt,m); ");
-	//printf("\n");
-	//transpose (b,bt,m);
+	////printf(" transpose (b,bt,m); ");
+	////printf("\n");
+	////transpose (b,bt,m);
 
-	//printf(" fun_col_fstinv( b,m, n, nn); ");
-	//printf("\n");
-	//fun_col_fstinv( b, m, n, nn);
+	////printf(" fun_col_fstinv( b,m, n, nn); ");
+	////printf("\n");
+	////fun_col_fstinv( b, m, n, nn);
 
-	printf("umax = matrix_find_max(matrix1);\n");
+	//sleep(myrank*5);
+	//matrix_print(matrix1);
+	//printf("umax = matrix_find_max(matrix1);\n");
+	matrix_save("out.dat", matrix1);
 	umax = matrix_find_max(matrix1);
 
 	printf (" umax = %e \n",umax);

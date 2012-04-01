@@ -52,4 +52,4 @@ matrix_p  matrix_transpose(matrix_p old);
 matrix_p Gen_matrix( int size , int nprocs, int rank, Real (*func)(int,int,Real));
 int calc_width_(int rank, int size, int nprocs);
 Real matrix_find_max(matrix_p matrix);
-
+void Matrix_save(const char* filename, matrix_p matrix);

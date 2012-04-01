@@ -186,13 +186,11 @@ int calc_width_( int size, int _nprocs, int rank){
 }
 
 void matrix_fst( matrix_p matrix){
-//#pragma omp parallel
 	{
 		int _depth = matrix -> depth;
 		int _n = _depth+1;
 		int _nn =  _n*4;
 		Real *temparray= malloc(sizeof(Real)*_nn +1000000);
-//#pragma omp for schedule(static)
 		for ( int i = 0 ; i < matrix -> width ; ++i ){
 			fst_(matrix->vals[i], &_n, temparray, &_nn);
 		}
@@ -201,13 +199,11 @@ void matrix_fst( matrix_p matrix){
 }
 
 void matrix_fst_inv( matrix_p matrix){
-//#pragma omp parallel
 	{
 		int _depth = matrix->depth;
 		int _n = _depth+1;
 		int _nn = _n*4;
 		Real *temparray = malloc(sizeof(Real)*_nn);
-//#pragma omp for schedule(static)
 		for (int j=0; j < matrix->width; j++) {
 			fstinv_(matrix->vals[j], &_n, temparray, &_nn);
 		}
@@ -234,5 +230,30 @@ Real matrix_find_max(matrix_p matrix){
 		}
 	}
 	return max;
+}
+void matrix_save(const char* filename, matrix_p matrix){
+	for (int rank=0; rank<nprocs; ++rank)
+	{
+		if ( rank == myrank )
+		{
+			// Open output file                 
+			FILE* fout = fopen(filename, "a");
+
+			// Write contents to file
+			for (int j=0; j<matrix->width; ++j)  
+			{
+				for (int i=0; i<matrix->depth; ++i)
+				{                      
+					fprintf(fout, "%19.16f ", matrix->vals[j][i]);
+				}                                                                     
+				fprintf(fout, "\n");
+			}
+
+			// Close output file
+			fclose(fout);
+		}
+
+		MPI_Barrier(MPI_COMM_WORLD);
+	}                             
 }
 
