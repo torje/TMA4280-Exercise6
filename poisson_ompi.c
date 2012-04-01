@@ -22,7 +22,8 @@ char processor_name[MPI_MAX_PROCESSOR_NAME];
 MPI_Status status;
 
 Real habitant(int a, int b, Real scale){
-	return scale*scale;
+	//return scale*sin(scale*a*M_PI)*sin(scale*b*M_PI);
+	return scale;
 	//return a*5 +b;
 }
 
@@ -30,7 +31,7 @@ void matrix_print(matrix_p a){
 	for ( int i =0; i <a->width; ++i ){
 		printf("[ ");
 		for ( int j = 0 ; j < a->depth; ++j){
-			printf(" %.0lf " , a->vals[i][j]);
+			printf(" %lf " , a->vals[i][j]);
 		}
 		printf(" ]\n");
 	}
@@ -75,6 +76,7 @@ int main(int argc, char **argv )
 	printf("fun_populate_diag(diag, m , n);\n");
 	fun_populate_diag(diag, m , n);
 
+	matrix_print(matrix1);
 	
 	printf("matrix_fst( matrix1);\n");
 	matrix_fst( matrix1);
