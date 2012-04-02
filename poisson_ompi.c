@@ -43,6 +43,7 @@ int main(int argc, char **argv )
 
 	Real *diag, **b, **bt;
 	Real pi, h, umax;
+	double time;
 	int i, j, n, m, nn;
 
 	/* the total number of grid points in each spatial direction is (n+1) */
@@ -62,64 +63,29 @@ int main(int argc, char **argv )
 	diag = createRealArray (m);
 	b    = createReal2DArray (m,m);
 	matrix_p matrix1 = Gen_matrix( m, nprocs, myrank, &habitant);
-	//printf(" ----------- %d ------------- %d\n", matrix1 -> width, matrix1 -> depth);
 	bt   = createReal2DArray (m,m);
 
 	h    = 1./(Real)n;
 	pi   = 4.*atan(1.);
 
-	//matrix_print(matrix1);
-
 	fun_populate_diag(diag, m , n);
 
+	time = MPI_Wtime();
 	matrix_fst( matrix1);
 	
 	matrix_p matrix2 = matrix_transpose(matrix1);
-	//
 	matrix_fst_inv(matrix2);
-	//
 	matrix_strange(diag, matrix2, nprocs, myrank);
-
-	////printf(" ----------- %d ------------- %d\n", matrix2 -> width, matrix2 -> depth);
-	//
 	matrix_fst(matrix2);
-	//
 	matrix1 = matrix_transpose(matrix2);
-	//
 	matrix_fst_inv(matrix1);
-
-	////printf("transpose (bt,b,m); ");
-	////printf("\n");
-	////transpose (bt,b,m);
-
-	////printf("fun_col_fstinv(  bt , m , n , nn ); ");
-	////printf("\n");
-	////fun_col_fstinv(  bt , m , n , nn );
-
-
-	////printf("fun_strange(diag, bt, m); ");
-	////printf("\n");
-	////fun_strange(diag, bt, m);
-
-	////printf("fun_col_fst(bt, m, n, nn);");
-	////printf("\n");
-	////fun_col_fst(bt, m, n, nn);
-
-	////printf(" transpose (b,bt,m); ");
-	////printf("\n");
-	////transpose (b,bt,m);
-
-	////printf(" fun_col_fstinv( b,m, n, nn); ");
-	////printf("\n");
-	////fun_col_fstinv( b, m, n, nn);
-
-	//sleep(myrank*5);
-	//matrix_print(matrix1);
-	//printf("umax = matrix_find_max(matrix1);\n");
+	time -= MPI_Wtime();
+	time = -time;
 	matrix_save("out.dat", matrix1);
-	umax = matrix_find_max(matrix1);
+	//umax = matrix_find_max(matrix1);
 
-	printf (" umax = %e \n",umax);
+	//printf (" umax = %e \n",umax);
+	printf("%.2lf\n", time);
 	MPI_Finalize();
 
 }
