@@ -22,7 +22,11 @@ char processor_name[MPI_MAX_PROCESSOR_NAME];
 MPI_Status status;
 
 Real habitant(int a, int b, Real scale){
-	return 5*M_PI*M_PI*scale*scale*sin(7*M_PI*(b)*scale)*sin(7*M_PI*(a)*scale);
+	return 5*M_PI*M_PI*scale*scale*sin(2*M_PI*(b+1)*scale)*sin(M_PI*(a+1)*scale);
+}
+
+Real deduct(int a, int b, Real scale){
+	return sin(2*M_PI*(b+1)*scale)*sin(M_PI*(a+1)*scale);
 }
 
 void matrix_print(matrix_p a){
@@ -82,10 +86,11 @@ int main(int argc, char **argv )
 	time -= MPI_Wtime();
 	time = -time;
 	matrix_save("out.dat", matrix1);
-	//umax = matrix_find_max(matrix1);
+	subtract_matrix_func( matrix1, m, nprocs, myrank, &deduct);
+	umax = matrix_find_max(matrix1);
 
-	//printf (" umax = %e \n",umax);
-	printf("%.2lf\n", time);
+	printf ("%e, ",umax);
 	MPI_Finalize();
+
 
 }

@@ -269,3 +269,15 @@ void matrix_save(const char* filename, matrix_p matrix){
 	}                             
 }
 
+matrix_p subtract_matrix_func( matrix_p matrix, int size , int _nprocs, int rank, Real (*func)(int,int,Real)){
+	int width = calc_width_(size, _nprocs, rank);
+	int l_bound= l_bound_(size, _nprocs, rank );
+	int h_bound= h_bound_(size, _nprocs, rank );
+	Real scale=1/((Real)(size+1));
+	for(int i = l_bound ; i < h_bound ; ++i ){
+		for(int j = 0 ; j < size ; ++j ){
+			matrix -> vals[i-l_bound][j] -= func( i, j, scale);
+		}
+	}
+	return matrix;
+}
