@@ -1,15 +1,15 @@
 #include "utils.h"
 #define  pi   3.14159265358979323846
 
-void fun_populate_diag( Real * diag, int m , int n){
+void fun_populate_diag( double * diag, int m , int n){
 #pragma omp parallel for
 	for (int i=0; i < m; i++) {
-		diag[i] = 2.*(1.-cos((i+1)*pi/(Real)n));
+		diag[i] = 2.*(1.-cos((i+1)*pi/(double)n));
 	}
 	return;
 }
 
-void fun_populate_b(Real **b, int m, Real h2) {
+void fun_populate_b(double **b, int m, double h2) {
 #pragma omp parallel for
 	for (int j=0; j < m; j++) {
 		for (int i=0; i < m; i++) {
@@ -21,7 +21,7 @@ void fun_populate_b(Real **b, int m, Real h2) {
 
 
 
-void fun_strange(Real *diag, Real **bt, int m) {
+void fun_strange(double *diag, double **bt, int m) {
 #pragma omp parallel for
 	for (int j=0; j < m; j++) {
 		for (int i=0; i < m; i++) {
@@ -31,10 +31,10 @@ void fun_strange(Real *diag, Real **bt, int m) {
 	return;
 }
 
-void fun_col_fst(Real **bt,  int m, int n, int nn ){
+void fun_col_fst(double **bt,  int m, int n, int nn ){
 #pragma omp parallel
 	{
-		Real *z = malloc(sizeof(Real)*nn);
+		double *z = malloc(sizeof(double)*nn);
 		int _n = n;
 		int _m = m;
 		int _nn = nn;
@@ -48,10 +48,10 @@ void fun_col_fst(Real **bt,  int m, int n, int nn ){
 
 }
 
-void fun_col_fstinv(Real **b , int m ,int n , int nn){
+void fun_col_fstinv(double **b , int m ,int n , int nn){
 #pragma omp parallel
 	{
-		Real *z = malloc(sizeof(Real)*nn);
+		double *z = malloc(sizeof(double)*nn);
 		int _n = n;
 		int _m = m;
 		int _nn = nn;
@@ -64,8 +64,8 @@ void fun_col_fstinv(Real **b , int m ,int n , int nn){
 	return;
 }
 
-Real fun_find_umax( Real **b ,int m ){
-	Real umax = 0.0; 
+double fun_find_umax( double **b ,int m ){
+	double umax = 0.0; 
 #pragma omp parallel for
 	for (size_t j=0; j < m; j++) {
 		for (size_t i =0; i < m; i++) {
@@ -77,7 +77,7 @@ Real fun_find_umax( Real **b ,int m ){
 	return umax;
 }
 
-void transpose (Real **bt, Real **b, int m)
+void transpose (double **bt, double **b, int m)
 {
 	int i, j;
 	for (j=0; j < m; j++) {
@@ -89,11 +89,11 @@ void transpose (Real **bt, Real **b, int m)
 	return;
 }
 
-Real *createRealArray (int n)
+double *createRealArray (int n)
 {
-	Real *a;
+	double *a;
 	int i;
-	a = (Real *)malloc(n*sizeof(Real));
+	a = (double *)malloc(n*sizeof(double));
 #pragma omp parallel for
 	for (i=0; i < n; i++) {
 		a[i] = 0.0;
@@ -101,16 +101,16 @@ Real *createRealArray (int n)
 	return a;
 }
 
-Real **createReal2DArray (int n1, int n2)
+double **createReal2DArray (int n1, int n2)
 {
 	int i, n;
-	Real **a;
-	a    = (Real **)malloc(n1   *sizeof(Real *));
-	a[0] = (Real  *)malloc(n1*n2*sizeof(Real));
+	double **a;
+	a    = (double **)malloc(n1   *sizeof(double *));
+	a[0] = (double  *)malloc(n1*n2*sizeof(double));
 	for (i=1; i < n1; i++) {
 		a[i] = a[i-1] + n2;
 	}
 	n = n1*n2;
-	memset(a[0],0,n*sizeof(Real));
+	memset(a[0],0,n*sizeof(double));
 	return (a);
 }

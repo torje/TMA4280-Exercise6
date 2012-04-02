@@ -5,11 +5,11 @@
 #include <stdio.h>
 extern int nprocs, myrank, problemsize;
 extern MPI_Comm world_com;
-typedef double Real;
+typedef double double;
 typedef struct {
 	int width,
 		depth;
-	Real ** vals; 
+	double ** vals; 
 } matrix_t;
 typedef matrix_t * matrix_p;
 
@@ -19,7 +19,7 @@ typedef struct {
 	int  *senddispl;
 	int  *recvcounts;
 	int	 *recvdispl;
-	Real *data;
+	double *data;
 } comm_helper_t;
 typedef comm_helper_t * comm_helper_p;
 
@@ -36,21 +36,28 @@ typedef comm_helper_t * comm_helper_p;
   MPI_Comm comm)
   */
 
-int calc_width(int rank);
 matrix_p matrix_construct(int width, int depth);
 void matrix_delete(matrix_p old);
-Real *matrix_sort(matrix_p old);
-matrix_p matrix_unsort(Real * data);
-int *create_senddispl() ;
-int *c_sendcounts() ;
+double * matrix_sort(matrix_p old);
+void matrix_print(matrix_p a);
+matrix_p matrix_unsort(double * data);
+int* create_senddispl() ;
+int calc_width(int rank);
+int* c_sendcounts() ;
 comm_helper_p create_comm_list(matrix_p data);
 void free_comm_list(comm_helper_p a);
-Real *sendarr( comm_helper_p a);
-int *c_receivecounts();
+double *sendarr( comm_helper_p a);
+int * c_receivecounts();
 int *c_recvdispl();
 matrix_p  matrix_transpose(matrix_p old);
-matrix_p Gen_matrix( int size , int nprocs, int rank, Real (*func)(int,int,Real));
-int calc_width_(int rank, int size, int nprocs);
-Real matrix_find_max(matrix_p matrix);
-void Matrix_save(const char* filename, matrix_p matrix);
-matrix_p subtract_matrix_func( matrix_p matrix, int size , int _nprocs, int rank, Real (*func)(int,int,Real));
+int l_bound_(int size, int _nprocs, int rank);
+int h_bound_(int size, int _nprocs, int rank);
+matrix_p Gen_matrix( int size , int _nprocs, int rank, double (*func)(int,int,double));
+int calc_width_( int size, int _nprocs, int rank);
+void matrix_fst( matrix_p matrix);
+void matrix_fst_inv( matrix_p matrix);
+void matrix_strange(double *diag, matrix_p matrix, int _nprocs, int rank) ;
+double matrix_find_max(matrix_p matrix);
+//Lånte denne fra jabirali
+void matrix_save(const char* filename, matrix_p matrix);
+matrix_p subtract_matrix_func( matrix_p matrix, int size , int _nprocs, int rank, double (*func)(int,int,double));

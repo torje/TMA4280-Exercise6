@@ -2,11 +2,11 @@
 
 matrix_p matrix_construct(int width, int depth){
 	matrix_p matrix = malloc(sizeof(matrix_t));
-	matrix -> vals = malloc(sizeof(Real)* width);
+	matrix -> vals = malloc(sizeof(double)* width);
 	matrix -> width = width;
 	matrix -> depth =  depth;
 	for ( int i = 0 ;  i < width ; ++i){
-		matrix -> vals [i] = malloc(sizeof(Real)*depth);
+		matrix -> vals [i] = malloc(sizeof(double)*depth);
 	}
 	return matrix;
 }
@@ -16,9 +16,9 @@ void matrix_delete(matrix_p old){
 	return;
 }
 
-Real * matrix_sort(matrix_p old){
-	Real * sorted = malloc( sizeof(Real)*((old -> depth) )* (old-> width));
-	Real * ptr = sorted;
+double * matrix_sort(matrix_p old){
+	double * sorted = malloc( sizeof(double)*((old -> depth) )* (old-> width));
+	double * ptr = sorted;
 	int stride;
 	int offset = 0;
 	stride = old -> depth/nprocs;
@@ -26,15 +26,16 @@ Real * matrix_sort(matrix_p old){
 		stride = old -> depth/nprocs;
 		stride += (j <  old->depth % nprocs ) ? 1 : 0 ;
 		for ( int i = 0 ; i < old -> width ; ++i ){
-			memcpy( ptr , old -> vals[i]+offset,  stride*sizeof(Real));
+			memcpy( ptr , old -> vals[i]+offset,  stride*sizeof(double));
 			ptr += stride;
 		}
 		offset+=stride;
 	}
 	return sorted;
 }
+
 void matrix_print(matrix_p a);
-matrix_p matrix_unsort(Real * data){
+matrix_p matrix_unsort(double * data){
 	int width = problemsize / nprocs;
 	width +=  (problemsize % nprocs > myrank)? 1: 0;
 	matrix_p matrix = matrix_construct( width , problemsize);
@@ -45,6 +46,7 @@ matrix_p matrix_unsort(Real * data){
 	}
 	return matrix;
 }
+
 int* create_senddispl() {
 	int * sizes = malloc( nprocs* sizeof( int ));
 	sizes[0] = 0;
@@ -64,6 +66,7 @@ int* create_senddispl() {
 	}
 	return sizes; 
 }
+
 int calc_width(int rank){
 	int width = problemsize / nprocs;
 	width +=  (problemsize %nprocs > rank)?1: 0;
@@ -98,6 +101,7 @@ comm_helper_p create_comm_list(matrix_p data){
 	comms -> recvcounts = c_receivecounts();
 	return comms;
 }
+
 void free_comm_list(comm_helper_p a){
 	free( a ->sendcounts);
 	free( a ->senddispl);
@@ -107,14 +111,15 @@ void free_comm_list(comm_helper_p a){
 	free(a);
 	return;
 }
-Real *sendarr( comm_helper_p a){
+
+double *sendarr( comm_helper_p a){
 	int width = problemsize / nprocs;
 	width +=  (problemsize %nprocs > myrank)?1: 0;
 	int depth = problemsize;
 	int recvsize = width * depth;
 
 
-	Real *recvbuf = malloc(sizeof(Real)*recvsize);
+	double *recvbuf = malloc(sizeof(double)*recvsize);
 	MPI_Alltoallv( a -> data ,a -> sendcounts, a -> senddispl, MPI_DOUBLE, recvbuf, a->recvcounts, a->recvdispl , MPI_DOUBLE, MPI_COMM_WORLD);
 	return recvbuf;
 }
@@ -145,11 +150,12 @@ int *c_recvdispl(){
 
 matrix_p  matrix_transpose(matrix_p old){
 	comm_helper_p com = create_comm_list(old);
-	Real * received = sendarr(com);
+	double * received = sendarr(com);
 	matrix_p new = matrix_unsort(received);
 	free_comm_list(com);
 	return new;
 }
+
 int l_bound_(int size, int _nprocs, int rank){
 	int i= 0;
 	int displacement = 0;
@@ -157,6 +163,7 @@ int l_bound_(int size, int _nprocs, int rank){
 	for ( ;i < rank; displacement += size/_nprocs, ++i);
 	return displacement;
 }
+
 int h_bound_(int size, int _nprocs, int rank){
 	int i= 0;
 	int displacement = 0;
@@ -165,11 +172,11 @@ int h_bound_(int size, int _nprocs, int rank){
 	return displacement;
 }
 
-matrix_p Gen_matrix( int size , int _nprocs, int rank, Real (*func)(int,int,Real)){
+matrix_p Gen_matrix( int size , int _nprocs, int rank, double (*func)(int,int,double)){
 	int width = calc_width_(size, _nprocs, rank);
 	int l_bound= l_bound_(size, _nprocs, rank );
 	int h_bound= h_bound_(size, _nprocs, rank );
-	Real scale=1/((Real)(size+1));
+	double scale=1/((double)(size+1));
 	matrix_p matrix = matrix_construct(h_bound - l_bound, size);
 	for(int i = l_bound ; i < h_bound ; ++i ){
 		for(int j = 0 ; j < size ; ++j ){
@@ -192,7 +199,7 @@ void matrix_fst( matrix_p matrix){
 			int _depth = matrix -> depth;
 			int _n = _depth+1;
 			int _nn =  _n*4;
-			Real *temparray= malloc(sizeof(Real)*_nn +1000000);
+			double *temparray= malloc(sizeof(double)*_nn +1000000);
 #pragma omp for
 			for ( int i = 0 ; i < matrix -> width ; ++i ){
 				fst_(matrix->vals[i], &_n, temparray, &_nn);
@@ -209,7 +216,7 @@ void matrix_fst_inv( matrix_p matrix){
 			int _depth = matrix->depth;
 			int _n = _depth+1;
 			int _nn = _n*4;
-			Real *temparray = malloc(sizeof(Real)*_nn);
+			double *temparray = malloc(sizeof(double)*_nn);
 #pragma omp for
 			for (int j=0; j < matrix->width; j++) {
 				fstinv_(matrix->vals[j], &_n, temparray, &_nn);
@@ -220,7 +227,7 @@ void matrix_fst_inv( matrix_p matrix){
 	return;
 }
 
-void matrix_strange(Real *diag, matrix_p matrix, int _nprocs, int rank) {
+void matrix_strange(double *diag, matrix_p matrix, int _nprocs, int rank) {
 	int l_bound = l_bound_(matrix -> depth, _nprocs, rank),
 		h_bound = h_bound_(matrix -> depth, _nprocs, rank);
 #pragma omp parallel for
@@ -231,8 +238,9 @@ void matrix_strange(Real *diag, matrix_p matrix, int _nprocs, int rank) {
 	}
 	return;
 }
-Real matrix_find_max(matrix_p matrix){
-	Real max=0;
+
+double matrix_find_max(matrix_p matrix){
+	double max=0;
 #pragma omp paralell for
 	for ( int i = 0 ; i < matrix -> width ; ++i){
 		for ( int j = 0 ; j < matrix -> width ; ++j){
@@ -269,11 +277,11 @@ void matrix_save(const char* filename, matrix_p matrix){
 	}                             
 }
 
-matrix_p subtract_matrix_func( matrix_p matrix, int size , int _nprocs, int rank, Real (*func)(int,int,Real)){
+matrix_p subtract_matrix_func( matrix_p matrix, int size , int _nprocs, int rank, double (*func)(int,int,double)){
 	int width = calc_width_(size, _nprocs, rank);
 	int l_bound= l_bound_(size, _nprocs, rank );
 	int h_bound= h_bound_(size, _nprocs, rank );
-	Real scale=1/((Real)(size+1));
+	double scale=1/((double)(size+1));
 	for(int i = l_bound ; i < h_bound ; ++i ){
 		for(int j = 0 ; j < size ; ++j ){
 			matrix -> vals[i-l_bound][j] -= func( i, j, scale);
@@ -281,3 +289,38 @@ matrix_p subtract_matrix_func( matrix_p matrix, int size , int _nprocs, int rank
 	}
 	return matrix;
 }
+
+void matrix_print(matrix_p a){
+	for ( int i =0; i <a->width; ++i ){
+		for ( int j = 0 ; j < a->depth; ++j){
+			printf(" %lf " , a->vals[i][j]);
+		}
+		printf("\n");
+	}
+}
+
+matrix_p matrix_construct(int width, int depth);
+void matrix_delete(matrix_p old);
+double * matrix_sort(matrix_p old);
+void matrix_print(matrix_p a);
+matrix_p matrix_unsort(double * data);
+int* create_senddispl() ;
+int calc_width(int rank);
+int* c_sendcounts() ;
+comm_helper_p create_comm_list(matrix_p data);
+void free_comm_list(comm_helper_p a);
+double *sendarr( comm_helper_p a);
+int * c_receivecounts();
+int *c_recvdispl();
+matrix_p  matrix_transpose(matrix_p old);
+int l_bound_(int size, int _nprocs, int rank);
+int h_bound_(int size, int _nprocs, int rank);
+matrix_p Gen_matrix( int size , int _nprocs, int rank, double (*func)(int,int,double));
+int calc_width_( int size, int _nprocs, int rank);
+void matrix_fst( matrix_p matrix);
+void matrix_fst_inv( matrix_p matrix);
+void matrix_strange(double *diag, matrix_p matrix, int _nprocs, int rank) ;
+double matrix_find_max(matrix_p matrix);
+//Lånte denne fra jabirali
+void matrix_save(const char* filename, matrix_p matrix);
+matrix_p subtract_matrix_func( matrix_p matrix, int size , int _nprocs, int rank, double (*func)(int,int,double));

@@ -21,21 +21,12 @@ int nprocs, problemsize, width, myrank, namelen;
 char processor_name[MPI_MAX_PROCESSOR_NAME];
 MPI_Status status;
 
-Real habitant(int a, int b, Real scale){
+double habitant(int a, int b, double scale){
 	return 5*M_PI*M_PI*scale*scale*sin(2*M_PI*(b+1)*scale)*sin(M_PI*(a+1)*scale);
 }
 
-Real deduct(int a, int b, Real scale){
+double deduct(int a, int b, double scale){
 	return sin(2*M_PI*(b+1)*scale)*sin(M_PI*(a+1)*scale);
-}
-
-void matrix_print(matrix_p a){
-	for ( int i =0; i <a->width; ++i ){
-		for ( int j = 0 ; j < a->depth; ++j){
-			printf(" %lf " , a->vals[i][j]);
-		}
-		printf("\n");
-	}
 }
 
 int main(int argc, char **argv )
@@ -45,8 +36,8 @@ int main(int argc, char **argv )
 	MPI_Comm_rank(MPI_COMM_WORLD, &myrank);
 	MPI_Get_processor_name(processor_name, &namelen);
 
-	Real *diag, **b, **bt;
-	Real pi, h, umax;
+	double *diag, **b, **bt;
+	double pi, h, umax;
 	double time;
 	int i, j, n, m, nn;
 
@@ -69,7 +60,7 @@ int main(int argc, char **argv )
 	matrix_p matrix1 = Gen_matrix( m, nprocs, myrank, &habitant);
 	bt   = createReal2DArray (m,m);
 
-	h    = 1./(Real)n;
+	h    = 1./(double)n;
 	pi   = 4.*atan(1.);
 
 	fun_populate_diag(diag, m , n);

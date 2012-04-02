@@ -18,8 +18,8 @@
 
 int main(int argc, char **argv )
 {
-	Real *diag, **b, **bt;
-	Real pi, h, umax;
+	double *diag, **b, **bt;
+	double pi, h, umax;
 	int i, j, n, m, nn;
 
 	/* the total number of grid points in each spatial direction is (n+1) */
@@ -39,7 +39,7 @@ int main(int argc, char **argv )
 	b    = createReal2DArray (m,m);
 	bt   = createReal2DArray (m,m);
 
-	h    = 1./(Real)n;
+	h    = 1./(double)n;
 	pi   = 4.*atan(1.);
 
 	printf("fun_populate_diag(diag, m , n);");
