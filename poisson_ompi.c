@@ -67,7 +67,7 @@ int main(int argc, char **argv )
 
 	time = MPI_Wtime();
 	matrix_fst( matrix1);
-	
+
 	matrix_p matrix2 = matrix_transpose(matrix1);
 	matrix_fst_inv(matrix2);
 	matrix_strange(diag, matrix2, nprocs, myrank);
@@ -78,10 +78,11 @@ int main(int argc, char **argv )
 	time = -time;
 	matrix_save("out.dat", matrix1);
 	subtract_matrix_func( matrix1, m, nprocs, myrank, &deduct);
+	matrix_abs(matrix1);
 	umax = matrix_find_max(matrix1);
 
 	printf ("%e, ",umax);
 	MPI_Finalize();
-
+	return 0;
 
 }

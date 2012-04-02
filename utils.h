@@ -5,7 +5,6 @@
 #include <memory.h>
 #include <math.h>
 #include <omp.h>
-typedef double double;
 
 void fun_populate_diag( double * diag, int m , int n);
 void fun_populate_b(double **b, int m, double h2) ;

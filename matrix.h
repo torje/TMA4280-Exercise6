@@ -3,9 +3,9 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <math.h>
 extern int nprocs, myrank, problemsize;
 extern MPI_Comm world_com;
-typedef double double;
 typedef struct {
 	int width,
 		depth;
@@ -39,7 +39,6 @@ typedef comm_helper_t * comm_helper_p;
 matrix_p matrix_construct(int width, int depth);
 void matrix_delete(matrix_p old);
 double * matrix_sort(matrix_p old);
-void matrix_print(matrix_p a);
 matrix_p matrix_unsort(double * data);
 int* create_senddispl() ;
 int calc_width(int rank);
@@ -60,4 +59,6 @@ void matrix_strange(double *diag, matrix_p matrix, int _nprocs, int rank) ;
 double matrix_find_max(matrix_p matrix);
 //Lånte denne fra jabirali
 void matrix_save(const char* filename, matrix_p matrix);
-matrix_p subtract_matrix_func( matrix_p matrix, int size , int _nprocs, int rank, double (*func)(int,int,double));
+void subtract_matrix_func( matrix_p matrix, int size , int _nprocs, int rank, double (*func)(int,int,double));
+void matrix_print(matrix_p a);
+void matrix_abs(matrix_p matrix);

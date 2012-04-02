@@ -34,7 +34,6 @@ double * matrix_sort(matrix_p old){
 	return sorted;
 }
 
-void matrix_print(matrix_p a);
 matrix_p matrix_unsort(double * data){
 	int width = problemsize / nprocs;
 	width +=  (problemsize % nprocs > myrank)? 1: 0;
@@ -193,37 +192,35 @@ int calc_width_( int size, int _nprocs, int rank){
 }
 
 void matrix_fst( matrix_p matrix){
-	{
+	extern void fst_( double *, int *, double*, int *);
 #pragma omp parallel
-		{
-			int _depth = matrix -> depth;
-			int _n = _depth+1;
-			int _nn =  _n*4;
-			double *temparray= malloc(sizeof(double)*_nn +1000000);
+	{
+		int _depth = matrix -> depth;
+		int _n = _depth+1;
+		int _nn =  _n*4;
+		double *temparray= malloc(sizeof(double)*_nn +1000000);
 #pragma omp for
-			for ( int i = 0 ; i < matrix -> width ; ++i ){
-				fst_(matrix->vals[i], &_n, temparray, &_nn);
-			}
-			free(temparray);
+		for ( int i = 0 ; i < matrix -> width ; ++i ){
+			fst_(matrix->vals[i], &_n, temparray, &_nn);
 		}
+		free(temparray);
 	}
 }
 
 void matrix_fst_inv( matrix_p matrix){
-	{
+	extern void fstinv_( double *, int *, double*, int *);
 #pragma omp parallel
-		{
-			int _depth = matrix->depth;
-			int _n = _depth+1;
-			int _nn = _n*4;
-			double *temparray = malloc(sizeof(double)*_nn);
+	{
+		int _depth = matrix->depth;
+		int _n = _depth+1;
+		int _nn = _n*4;
+		double *temparray = malloc(sizeof(double)*_nn);
 #pragma omp for
-			for (int j=0; j < matrix->width; j++) {
-				fstinv_(matrix->vals[j], &_n, temparray, &_nn);
-			}
+		for (int j=0; j < matrix->width; j++) {
+			fstinv_(matrix->vals[j], &_n, temparray, &_nn);
+		}
 			free(temparray);
 		}
-	}
 	return;
 }
 
@@ -277,7 +274,8 @@ void matrix_save(const char* filename, matrix_p matrix){
 	}                             
 }
 
-matrix_p subtract_matrix_func( matrix_p matrix, int size , int _nprocs, int rank, double (*func)(int,int,double)){
+
+void subtract_matrix_func( matrix_p matrix, int size , int _nprocs, int rank, double (*func)(int,int,double)){
 	int width = calc_width_(size, _nprocs, rank);
 	int l_bound= l_bound_(size, _nprocs, rank );
 	int h_bound= h_bound_(size, _nprocs, rank );
@@ -287,8 +285,15 @@ matrix_p subtract_matrix_func( matrix_p matrix, int size , int _nprocs, int rank
 			matrix -> vals[i-l_bound][j] -= func( i, j, scale);
 		}
 	}
-	return matrix;
 }
+void matrix_abs(matrix_p matrix){
+#pragma omp paralell for
+	for ( int i = 0 ; i < matrix -> width ; ++i){
+		for ( int j = 0 ; j < matrix -> width ; ++j){
+			matrix->vals[i][j] = fabs(matrix->vals[i][j]);
+		}
+	}
+ }
 
 void matrix_print(matrix_p a){
 	for ( int i =0; i <a->width; ++i ){
@@ -299,28 +304,3 @@ void matrix_print(matrix_p a){
 	}
 }
 
-matrix_p matrix_construct(int width, int depth);
-void matrix_delete(matrix_p old);
-double * matrix_sort(matrix_p old);
-void matrix_print(matrix_p a);
-matrix_p matrix_unsort(double * data);
-int* create_senddispl() ;
-int calc_width(int rank);
-int* c_sendcounts() ;
-comm_helper_p create_comm_list(matrix_p data);
-void free_comm_list(comm_helper_p a);
-double *sendarr( comm_helper_p a);
-int * c_receivecounts();
-int *c_recvdispl();
-matrix_p  matrix_transpose(matrix_p old);
-int l_bound_(int size, int _nprocs, int rank);
-int h_bound_(int size, int _nprocs, int rank);
-matrix_p Gen_matrix( int size , int _nprocs, int rank, double (*func)(int,int,double));
-int calc_width_( int size, int _nprocs, int rank);
-void matrix_fst( matrix_p matrix);
-void matrix_fst_inv( matrix_p matrix);
-void matrix_strange(double *diag, matrix_p matrix, int _nprocs, int rank) ;
-double matrix_find_max(matrix_p matrix);
-//Lånte denne fra jabirali
-void matrix_save(const char* filename, matrix_p matrix);
-matrix_p subtract_matrix_func( matrix_p matrix, int size , int _nprocs, int rank, double (*func)(int,int,double));
