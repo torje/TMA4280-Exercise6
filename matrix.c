@@ -241,6 +241,8 @@ Real matrix_find_max(matrix_p matrix){
 	}
 	return max;
 }
+
+//Lånte denne fra jabirali
 void matrix_save(const char* filename, matrix_p matrix){
 	for (int rank=0; rank<nprocs; ++rank)
 	{
